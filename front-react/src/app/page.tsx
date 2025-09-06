@@ -218,12 +218,12 @@ export default function Home() {
             <h2 className="font-display text-4xl sm:text-5xl font-bold text-white">Ready to get started?</h2>
             <p className="mt-4 text-xl text-slate-300">Start your 14-day free trial or book a personalized demo right now</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Pricing cards */}
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Free Plan */}
             <div className="alia-card">
-              <h3 className="text-xl font-bold text-white mb-2">Starter</h3>
+              <h3 className="text-xl font-bold text-white mb-2">Free Plan</h3>
               <div className="text-4xl font-bold text-white mb-1">$0</div>
-              <div className="text-slate-400 mb-6">Perfect for trying out</div>
+              <div className="text-slate-400 mb-6">Perfect for getting started</div>
               <ul className="space-y-3 text-slate-300 mb-8">
                 <li className="flex items-center gap-2">
                   <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
@@ -231,20 +231,36 @@ export default function Home() {
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
-                  100 messages/month
+                  500 messages/month
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
-                  Basic customization
+                  Basic knowledge base (up to 10 documents)
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
+                  Standard widget themes
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
+                  Email support
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
+                  Basic analytics
                 </li>
               </ul>
-              <Link href="/register" className="block w-full text-center rounded-2xl border border-slate-600 py-3 font-medium text-white hover:bg-slate-700 transition-all">🎁 Start Free</Link>
+              <Link href="/register" className="block w-full text-center rounded-2xl border border-slate-600 py-3 font-medium text-white hover:bg-slate-700 transition-all">🎁 Start Free Forever</Link>
             </div>
 
+            {/* Pro Plan */}
             <div className="alia-card border-primary relative">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-slate-900 px-4 py-1 rounded-full text-sm font-medium">Most Popular</div>
-              <h3 className="text-xl font-bold text-white mb-2">Pro</h3>
-              <div className="text-4xl font-bold text-white mb-1">$49</div>
+              <h3 className="text-xl font-bold text-white mb-2">Pro Plan</h3>
+              <div className="flex items-baseline gap-2 mb-1">
+                <div className="text-4xl font-bold text-white">$29</div>
+                <div className="text-slate-400 text-lg">/month</div>
+              </div>
               <div className="text-slate-400 mb-6">For growing businesses</div>
               <ul className="space-y-3 text-slate-300 mb-8">
                 <li className="flex items-center gap-2">
@@ -257,31 +273,30 @@ export default function Home() {
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
-                  Advanced customization
+                  Unlimited knowledge base documents
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
+                  Custom branding & themes
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
+                  Advanced analytics & insights
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
+                  Priority support & live chat
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
+                  API access & webhooks
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
+                  Lead capture & CRM integration
                 </li>
               </ul>
-              <Link href="/register" className="block w-full text-center btn-primary rounded-2xl py-3 font-medium hover:scale-105 transition-transform">⭐ Choose Pro</Link>
-            </div>
-
-            <div className="alia-card">
-              <h3 className="text-xl font-bold text-white mb-2">Enterprise</h3>
-              <div className="text-4xl font-bold text-white mb-1">Custom</div>
-              <div className="text-slate-400 mb-6">For large organizations</div>
-              <ul className="space-y-3 text-slate-300 mb-8">
-                <li className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
-                  Unlimited chatbots
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
-                  Unlimited messages
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">✓</span>
-                  White-label solution
-                </li>
-              </ul>
-              <a href="/contact" className="block w-full text-center rounded-2xl border border-slate-600 py-3 font-medium text-white hover:bg-slate-700 transition-all">💼 Contact Sales</a>
+              <Link href="/register" className="block w-full text-center btn-primary rounded-2xl py-3 font-medium hover:scale-105 transition-transform">⭐ Start 14-Day Free Trial</Link>
             </div>
           </div>
         </div>
