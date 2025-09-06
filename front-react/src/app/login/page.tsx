@@ -14,7 +14,7 @@ export default function LoginPage() {
     
     // Here you would typically send credentials to your backend
     console.log('Login attempt:', { email, password, remember });
-    
+    window.location.href = '/dashboard';
     // For demo purposes, just show an alert
     alert('This is a demo. In a real app, this would authenticate with your backend.');
   };
@@ -22,6 +22,7 @@ export default function LoginPage() {
   const handleGoogleSignIn = () => {
     // Here you would typically integrate with Google Sign-In
     console.log('Google Sign-In clicked');
+    window.location.href = '/dashboard';
     alert('This is a demo. In a real app, this would use Google Sign-In.');
   };
 
