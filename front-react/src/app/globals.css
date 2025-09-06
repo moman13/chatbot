@@ -1,0 +1,365 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: Poppins, Inter, system-ui, sans-serif;
+  --color-primary: #e5ff66;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
+  --shadow-soft: 0 10px 30px rgba(2, 6, 23, 0.10), 0 2px 6px rgba(2, 6, 23, 0.06);
+}
+
+/* Font family utilities */
+.font-sans {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.font-display {
+  font-family: Poppins, Inter, system-ui, sans-serif;
+}
+
+/* Global styles and small helpers to complement Tailwind */
+/* Font smoothing for a crisp, modern look */
+html, body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+:root {
+  --color-primary: 51 51 51; /* #333 main color */
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+}
+
+.soft-shadow {
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.10), 0 2px 6px rgba(2, 6, 23, 0.06);
+}
+
+.neumorph {
+  background: #ffffff;
+  box-shadow: 8px 8px 24px rgba(2, 6, 23, 0.08), -8px -8px 24px rgba(255, 255, 255, 0.6);
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
+}
+
+.float-slow {
+  animation: floatY 6s ease-in-out infinite;
+}
+
+.float-delay {
+  animation: floatY 7.5s ease-in-out infinite;
+  animation-delay: 1.25s;
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Dark gradient for hero */
+.alia-hero {
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+}
+
+/* Alia-style floating animation */
+.float-alia {
+  animation: floatAlia 8s ease-in-out infinite;
+}
+
+@keyframes floatAlia {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-8px) rotate(1deg); }
+  50% { transform: translateY(0) rotate(0deg); }
+  75% { transform: translateY(-4px) rotate(-1deg); }
+}
+
+/* Alia text highlight */
+.alia-highlight {
+  background: linear-gradient(90deg, #e5ff66 0%, #d9ff2e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Stats number styling */
+.stat-number {
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(135deg, #333 0%, #555 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Dark card style matching Alia */
+.alia-card {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(51, 65, 85, 0.8);
+  border-radius: 24px;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.alia-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  border-color: #e5ff66;
+  background: rgba(30, 41, 59, 0.8);
+}
+
+/* Testimonial card */
+.testimonial-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 2rem;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Reveal Up entrance */
+.reveal-up { opacity: 0; transform: translateY(16px); animation: revealUp .8s ease forwards; }
+@keyframes revealUp { to { opacity: 1; transform: translateY(0); } }
+.anim-delay-1 { animation-delay: .12s; }
+.anim-delay-2 { animation-delay: .24s; }
+.anim-delay-3 { animation-delay: .36s; }
+.anim-delay-4 { animation-delay: .48s; }
+
+/* Lime accent highlight */
+.neon-lime-text {
+  background: linear-gradient(180deg, #e5ff66 0%, #d9ff2e 60%, #e5ff66 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 18px rgba(229, 255, 102, 0.25);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.ring-gradient {
+  box-shadow: 0 0 0 4px rgba(229, 255, 102, 0.28); /* #e5ff66 ring */
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #e5ff66 0%, #d9ff2e 100%);
+  color: #333333;
+  box-shadow: 0 8px 28px rgba(229, 255, 102, 0.25), 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.04);
+}
+
+.card-hover {
+  transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(2, 6, 23, 0.10);
+}
+
+/* Chatbot widget theme variables */
+.chatbot-root {
+  --chat-bg: 255 255 255;
+  --chat-fg: 15 23 42; /* slate-900 */
+  --chat-muted: 100 116 139; /* slate-500 */
+  --chat-border: 226 232 240; /* slate-200 */
+}
+
+.chatbot-root.dark {
+  --chat-bg: 15 23 42; /* slate-900 */
+  --chat-fg: 241 245 249; /* slate-100 */
+  --chat-muted: 148 163 184; /* slate-400 */
+  --chat-border: 51 65 85; /* slate-700 */
+}
+
+.chat-input {
+  outline: none;
+}
+
+.chat-scrollbar::-webkit-scrollbar { width: 10px; }
+.chat-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.35);
+  border-radius: 9999px;
+}
+
+/* Dashboard-specific styles */
+/* Navigation styles */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  color: rgb(148 163 184); /* slate-400 */
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-item:hover {
+  background-color: rgb(51 65 85); /* slate-700 */
+  color: white;
+}
+
+.nav-item.active {
+  background-color: rgb(229 255 102); /* primary */
+  color: rgb(51 51 51); /* dark text on bright background */
+}
+
+.nav-item.active .nav-icon {
+  filter: grayscale(1) brightness(0.3);
+}
+
+.nav-icon {
+  font-size: 1.25rem;
+  width: 1.5rem;
+  text-align: center;
+}
+
+/* Section content */
+.section-content {
+  display: none;
+}
+
+.section-content.active {
+  display: block;
+}
+
+/* Dashboard cards */
+.dashboard-card {
+  background: rgb(30 41 59); /* slate-800 */
+  border: 1px solid rgb(51 65 85); /* slate-700 */
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.dashboard-card:hover {
+  border-color: rgb(229 255 102); /* primary */
+}
+
+/* Stat cards */
+.stat-card {
+  background: linear-gradient(135deg, rgb(30 41 59) 0%, rgb(51 65 85) 100%);
+  border: 1px solid rgb(51 65 85);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Chatbot cards */
+.chatbot-card {
+  background: rgb(30 41 59);
+  border: 1px solid rgb(51 65 85);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.chatbot-card:hover {
+  border-color: rgb(229 255 102);
+  transform: translateY(-1px);
+}
+
+/* Status badges */
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-badge.active {
+  background-color: rgb(34 197 94); /* green-500 */
+  color: white;
+}
+
+.status-badge.inactive {
+  background-color: rgb(156 163 175); /* gray-400 */
+  color: white;
+}
+
+.status-badge.paused {
+  background-color: rgb(251 191 36); /* amber-400 */
+  color: rgb(92 35 0); /* amber-900 */
+}
+
+/* Toggle switches */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgb(71 85 105); /* slate-600 */
+  transition: 0.3s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: rgb(229 255 102); /* primary */
+}
+
+input:checked + .slider:before {
+  transform: translateX(24px);
+  background-color: rgb(51 51 51);
+}
