@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AqlBot CDN Widget Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .demo-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+        
+        .demo-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .demo-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .demo-content {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .demo-section {
+            margin-bottom: 3rem;
+        }
+        
+        .demo-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+        
+        .demo-section p {
+            margin-bottom: 1rem;
+            color: #4a5568;
+        }
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .demo-card {
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .demo-card h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+        
+        .demo-card p {
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+        
+        .config-panel {
+            background: #2d3748;
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+        
+        .config-panel h3 {
+            margin-bottom: 1rem;
+        }
+        
+        .config-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .config-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .config-item label {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .config-item input,
+        .config-item select {
+            padding: 0.5rem;
+            border: 1px solid #4a5568;
+            border-radius: 6px;
+            background: #4a5568;
+            color: white;
+        }
+        
+        .config-item input[type="color"] {
+            height: 40px;
+            cursor: pointer;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #e5ff66 0%, #d9ff2e 100%);
+            color: #333;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+        
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #e5ff66 0%, #d9ff2e 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 0.5rem 0;
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .feature-list li:before {
+            content: '✅';
+            position: absolute;
+            left: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .demo-container {
+                padding: 1rem;
+            }
+            
+            .demo-header h1 {
+                font-size: 2rem;
+            }
+            
+            .demo-content {
+                padding: 2rem;
+            }
+            
+            .config-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>🤖 AqlBot CDN Widget</h1>
+            <p>Drop-in chatbot widget for any website. Zero dependencies, fully customizable, and ready to use in minutes.</p>
+        </div>
+        
+        <div class="demo-content">
+            <div class="demo-section">
+                <h2>🚀 Quick Start</h2>
+                <p>Add the AqlBot widget to your website with just two lines of code:</p>
+                
+                <div class="code-block">
+&lt;script src="../dist/aqlbot-widget.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  AqlBot.init({
+    botName: 'Your Bot',
+    primaryColor: '#e5ff66',
+    apiEndpoint: 'https://your-api.com/chat'
+  });
+&lt;/script&gt;
+                </div>
+            </div>
+            
+            <div class="demo-section">
+                <h2>✨ Features</h2>
+                <div class="demo-grid">
+                    <div class="demo-card">
+                        <h3>🎨 Fully Customizable</h3>
+                        <p>Change colors, position, size, and styling to match your brand perfectly.</p>
+                    </div>
+                    <div class="demo-card">
+                        <h3>📱 Mobile Responsive</h3>
+                        <p>Automatically adapts to mobile devices with optimized touch interactions.</p>
+                    </div>
+                    <div class="demo-card">
+                        <h3>🌙 Dark/Light Theme</h3>
+                        <p>Built-in theme support that respects user preferences and system settings.</p>
+                    </div>
+                    <div class="demo-card">
+                        <h3>⚡ Zero Dependencies</h3>
+                        <p>Pure vanilla JavaScript with no external libraries required.</p>
+                    </div>
+                    <div class="demo-card">
+                        <h3>🔌 API Ready</h3>
+                        <p>Connect to any chatbot API with built-in error handling and retry logic.</p>
+                    </div>
+                    <div class="demo-card">
+                        <h3>💬 Rich Interactions</h3>
+                        <p>Typing indicators, message history, and smooth animations included.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="demo-section">
+                <h2>⚙️ Live Configuration</h2>
+                <p>Try different settings and see the changes in real-time:</p>
+                
+                <div class="config-panel">
+                    <h3>Widget Settings</h3>
+                    <div class="config-group">
+                        <div class="config-item">
+                            <label for="botName">Bot Name</label>
+                            <input type="text" id="botName" value="AqlBot">
+                        </div>
+                        <div class="config-item">
+                            <label for="primaryColor">Primary Color</label>
+                            <input type="color" id="primaryColor" value="#e5ff66">
+                        </div>
+                        <div class="config-item">
+                            <label for="secondaryColor">Secondary Color</label>
+                            <input type="color" id="secondaryColor" value="#d9ff2e">
+                        </div>
+                        <div class="config-item">
+                            <label for="position">Position</label>
+                            <select id="position">
+                                <option value="bottom-right">Bottom Right</option>
+                                <option value="bottom-left">Bottom Left</option>
+                                <option value="top-right">Top Right</option>
+                                <option value="top-left">Top Left</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label for="theme">Theme</label>
+                            <select id="theme">
+                                <option value="dark">Dark</option>
+                                <option value="light">Light</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label for="welcomeMessage">Welcome Message</label>
+                            <input type="text" id="welcomeMessage" value="Hi! I'm AqlBot. How can I help you today?">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="updateWidget()">Update Widget</button>
+                    <button class="btn" onclick="resetWidget()" style="margin-left: 1rem; background: #ef4444;">Reset</button>
+                </div>
+            </div>
+            
+            <div class="demo-section">
+                <h2>📖 Configuration Options</h2>
+                <div class="demo-grid">
+                    <div class="demo-card">
+                        <h3>Basic Options</h3>
+                        <ul class="feature-list">
+                            <li><code>botName</code> - Display name</li>
+                            <li><code>welcomeMessage</code> - First message</li>
+                            <li><code>placeholder</code> - Input placeholder</li>
+                            <li><code>apiEndpoint</code> - Chat API URL</li>
+                        </ul>
+                    </div>
+                    <div class="demo-card">
+                        <h3>Styling Options</h3>
+                        <ul class="feature-list">
+                            <li><code>primaryColor</code> - Main accent color</li>
+                            <li><code>secondaryColor</code> - Secondary accent</li>
+                            <li><code>darkMode</code> - Enable dark theme</li>
+                            <li><code>borderRadius</code> - Corner radius</li>
+                        </ul>
+                    </div>
+                    <div class="demo-card">
+                        <h3>Layout Options</h3>
+                        <ul class="feature-list">
+                            <li><code>position</code> - Widget placement</li>
+                            <li><code>width</code> - Widget width (px)</li>
+                            <li><code>height</code> - Widget height (px)</li>
+                            <li><code>zIndex</code> - Stacking order</li>
+                        </ul>
+                    </div>
+                    <div class="demo-card">
+                        <h3>Behavior Options</h3>
+                        <ul class="feature-list">
+                            <li><code>enableTyping</code> - Typing indicators</li>
+                            <li><code>typingDelay</code> - Response delay</li>
+                            <li><code>maxMessages</code> - Message limit</li>
+                            <li><code>enableSound</code> - Sound effects</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="demo-section">
+                <h2>🔗 Integration Examples</h2>
+                
+                <h3>Basic Integration</h3>
+                <div class="code-block">
+&lt;script src="https://cdn.your-domain.com/aqlbot-widget.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  AqlBot.init({
+    botName: 'Support Bot',
+    apiEndpoint: 'https://api.your-domain.com/chat'
+  });
+&lt;/script&gt;
+                </div>
+                
+                <h3>Advanced Configuration</h3>
+                <div class="code-block">
+&lt;script&gt;
+  const widget = AqlBot.init({
+    botName: 'Customer Support',
+    welcomeMessage: 'Hello! How can we help you today?',
+    primaryColor: '#3b82f6',
+    secondaryColor: '#1e40af',
+    position: 'bottom-left',
+    darkMode: false,
+    width: 400,
+    height: 600,
+    enableTyping: true,
+    typingDelay: 800,
+    apiEndpoint: 'https://api.your-domain.com/chat',
+    showBranding: false
+  });
+  
+  // Programmatic control
+  widget.open();  // Open chat
+  widget.close(); // Close chat
+  widget.send('Hello from code!'); // Send message
+&lt;/script&gt;
+                </div>
+                
+                <h3>React Integration</h3>
+                <div class="code-block">
+import { useEffect } from 'react';
+
+function App() {
+  useEffect(() => {
+    // Load script dynamically
+    const script = document.createElement('script');
+    script.src = 'https://cdn.your-domain.com/aqlbot-widget.min.js';
+    script.onload = () => {
+      window.AqlBot.init({
+        botName: 'React Bot',
+        apiEndpoint: '/api/chat'
+      });
+    };
+    document.body.appendChild(script);
+    
+    return () => {
+      // Cleanup
+      if (window.AqlBot) {
+        window.AqlBot.destroy();
+      }
+    };
+  }, []);
+  
+  return &lt;div&gt;Your React App&lt;/div&gt;;
+}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load the widget -->
+    <script src="../src/chatbot-widget.js"></script>
+    <script>
+        let currentWidget = null;
+        
+        // Initialize default widget
+        function initWidget(config = {}) {
+            if (currentWidget) {
+                currentWidget.destroy();
+            }
+            
+            const defaultConfig = {
+                botName: 'AqlBot',
+                welcomeMessage: "Hi! I'm AqlBot. How can I help you today?",
+                primaryColor: '#e5ff66',
+                secondaryColor: '#d9ff2e',
+                position: 'bottom-right',
+                darkMode: true
+            };
+            
+            currentWidget = AqlBot.init({ ...defaultConfig, ...config });
+            return currentWidget;
+        }
+        
+        // Update widget with form values
+        function updateWidget() {
+            const config = {
+                botName: document.getElementById('botName').value,
+                primaryColor: document.getElementById('primaryColor').value,
+                secondaryColor: document.getElementById('secondaryColor').value,
+                position: document.getElementById('position').value,
+                darkMode: document.getElementById('theme').value === 'dark',
+                welcomeMessage: document.getElementById('welcomeMessage').value
+            };
+            
+            initWidget(config);
+        }
+        
+        // Reset to defaults
+        function resetWidget() {
+            document.getElementById('botName').value = 'AqlBot';
+            document.getElementById('primaryColor').value = '#e5ff66';
+            document.getElementById('secondaryColor').value = '#d9ff2e';
+            document.getElementById('position').value = 'bottom-right';
+            document.getElementById('theme').value = 'dark';
+            document.getElementById('welcomeMessage').value = "Hi! I'm AqlBot. How can I help you today?";
+            
+            initWidget();
+        }
+        
+        // Initialize default widget on load
+        initWidget();
+    </script>
+</body>
+</html>

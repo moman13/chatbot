@@ -1,0 +1,24 @@
+/**
+ * AqlBot CDN Widget Integration Guide
+ * 
+ * File sizes:
+ * - Development: 23KB
+ * - Minified: 15KB
+ * 
+ * Integrity Hash: sha384-rj+ZRmz2W/UAabQ4XowEc5ZpsXVMvRk4NyosWwW8THLMYasv51Wp2yzrGsO0kbHo
+ * 
+ * Basic Integration:
+ * <script src="https://your-cdn.com/aqlbot-widget.min.js"></script>
+ * <script>
+ *   AqlBot.init({
+ *     apiEndpoint: 'https://your-api.com/chat',
+ *     botName: 'Your Bot Name',
+ *     primaryColor: '#e5ff66'
+ *   });
+ * </script>
+ * 
+ * With Integrity Check:
+ * <script src="https://your-cdn.com/aqlbot-widget.min.js" 
+ *         integrity="sha384-rj+ZRmz2W/UAabQ4XowEc5ZpsXVMvRk4NyosWwW8THLMYasv51Wp2yzrGsO0kbHo" 
+ *         crossorigin="anonymous"></script>
+ */

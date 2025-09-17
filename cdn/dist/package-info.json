@@ -1,0 +1,33 @@
+{
+  "name": "aqlbot-widget",
+  "version": "1.0.0",
+  "description": "Embeddable chatbot widget for any website",
+  "main": "aqlbot-widget.min.js",
+  "files": {
+    "development": "aqlbot-widget.js",
+    "production": "aqlbot-widget.min.js"
+  },
+  "sizes": {
+    "development": "23KB",
+    "production": "15KB",
+    "gzipped": "~5KB (estimated)"
+  },
+  "integrity": "sha384-rj+ZRmz2W/UAabQ4XowEc5ZpsXVMvRk4NyosWwW8THLMYasv51Wp2yzrGsO0kbHo",
+  "features": [
+    "Zero dependencies",
+    "Responsive design",
+    "Dark/Light theme",
+    "Customizable colors",
+    "Multiple positioning options",
+    "API integration ready",
+    "Typing indicators",
+    "Message history",
+    "Mobile optimized"
+  ],
+  "compatibility": [
+    "Modern browsers (ES6+)",
+    "Internet Explorer 11+",
+    "Mobile browsers",
+    "All major frameworks (React, Vue, Angular, etc.)"
+  ]
+}

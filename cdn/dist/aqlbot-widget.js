@@ -1,0 +1,897 @@
+/**
+ * AqlBot CDN Widget
+ * A standalone chatbot widget that can be embedded on any website
+ * 
+ * Usage:
+ * <script src="https://your-cdn.com/aqlbot-widget.min.js"></script>
+ * <script>
+ *   AqlBot.init({
+ *     apiEndpoint: 'https://your-api.com/chat',
+ *     botName: 'AqlBot',
+ *     primaryColor: '#e5ff66',
+ *     position: 'bottom-right'
+ *   });
+ * </script>
+ */
+
+(function(window, document) {
+  'use strict';
+
+  // Default configuration
+  const defaultConfig = {
+    apiEndpoint: null,
+    botName: 'AqlBot',
+    welcomeMessage: "Hi! I'm AqlBot. How can I help you today?",
+    primaryColor: '#e5ff66',
+    secondaryColor: '#d9ff2e',
+    darkMode: true,
+    position: 'bottom-right', // bottom-right, bottom-left, top-right, top-left
+    zIndex: 1000,
+    width: 380,
+    height: 500,
+    borderRadius: 16,
+    showBranding: true,
+    placeholder: 'Type a message...',
+    sendButtonText: 'Send',
+    closeButtonText: '✕',
+    launcherIcon: '💬',
+    enableSound: false,
+    enableTyping: true,
+    typingDelay: 1000,
+    maxMessages: 100,
+    enableFileUpload: false,
+    enableEmoji: false
+  };
+
+  let config = { ...defaultConfig };
+  let messages = [];
+  let isOpen = false;
+  let isTyping = false;
+  let container = null;
+  let launcher = null;
+  let chatWindow = null;
+  let messagesContainer = null;
+  let inputElement = null;
+
+  // CSS Styles (embedded to avoid external dependencies)
+  const styles = `
+    .aqlbot-widget * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .aqlbot-widget {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      position: fixed;
+      z-index: var(--aqlbot-z-index);
+      pointer-events: none;
+    }
+    
+    .aqlbot-widget * {
+      pointer-events: auto;
+    }
+    
+    .aqlbot-launcher {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.08);
+      background: linear-gradient(135deg, var(--aqlbot-primary), var(--aqlbot-secondary));
+      color: #333;
+    }
+    
+    .aqlbot-launcher:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .aqlbot-chat-window {
+      width: var(--aqlbot-width);
+      max-width: 92vw;
+      height: var(--aqlbot-height);
+      max-height: 80vh;
+      border-radius: var(--aqlbot-border-radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+      transform-origin: bottom right;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .aqlbot-chat-window.aqlbot-opening {
+      animation: aqlbot-slideUp 0.3s ease;
+    }
+    
+    .aqlbot-chat-window.aqlbot-closing {
+      animation: aqlbot-slideDown 0.3s ease;
+    }
+    
+    @keyframes aqlbot-slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    @keyframes aqlbot-slideDown {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+    }
+    
+    /* Light theme */
+    .aqlbot-chat-window.aqlbot-light {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      color: #1e293b;
+    }
+    
+    .aqlbot-light .aqlbot-header {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border-bottom: 1px solid #e2e8f0;
+      color: #1e293b;
+    }
+    
+    .aqlbot-light .aqlbot-messages {
+      background: #ffffff;
+    }
+    
+    .aqlbot-light .aqlbot-input-area {
+      background: #ffffff;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .aqlbot-light .aqlbot-input {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #1e293b;
+    }
+    
+    .aqlbot-light .aqlbot-message.aqlbot-bot {
+      background: #f1f5f9;
+      color: #334155;
+    }
+    
+    .aqlbot-light .aqlbot-message.aqlbot-user {
+      background: var(--aqlbot-primary);
+      color: #1e293b;
+    }
+    
+    /* Dark theme */
+    .aqlbot-chat-window.aqlbot-dark {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+    }
+    
+    .aqlbot-dark .aqlbot-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border-bottom: 1px solid #334155;
+      color: #f1f5f9;
+    }
+    
+    .aqlbot-dark .aqlbot-messages {
+      background: #334155;
+    }
+    
+    .aqlbot-dark .aqlbot-input-area {
+      background: #1e293b;
+      border-top: 1px solid #334155;
+    }
+    
+    .aqlbot-dark .aqlbot-input {
+      background: #334155;
+      border: 1px solid #475569;
+      color: #f1f5f9;
+    }
+    
+    .aqlbot-dark .aqlbot-message.aqlbot-bot {
+      background: #475569;
+      color: #f1f5f9;
+    }
+    
+    .aqlbot-dark .aqlbot-message.aqlbot-user {
+      background: var(--aqlbot-primary);
+      color: #1e293b;
+    }
+    
+    .aqlbot-header {
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 60px;
+    }
+    
+    .aqlbot-header-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .aqlbot-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--aqlbot-primary), var(--aqlbot-secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .aqlbot-bot-name {
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .aqlbot-bot-status {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    .aqlbot-close-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 4px;
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+      color: inherit;
+    }
+    
+    .aqlbot-close-btn:hover {
+      opacity: 1;
+    }
+    
+    .aqlbot-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .aqlbot-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .aqlbot-messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .aqlbot-messages::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 3px;
+    }
+    
+    .aqlbot-message-wrapper {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    
+    .aqlbot-message-wrapper.aqlbot-user {
+      justify-content: flex-end;
+      flex-direction: row-reverse;
+    }
+    
+    .aqlbot-message-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    
+    .aqlbot-message-wrapper.aqlbot-bot .aqlbot-message-avatar {
+      background: #64748b;
+      color: white;
+    }
+    
+    .aqlbot-message-wrapper.aqlbot-user .aqlbot-message-avatar {
+      background: var(--aqlbot-primary);
+      color: #1e293b;
+    }
+    
+    .aqlbot-message {
+      max-width: 75%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+    
+    .aqlbot-message.aqlbot-bot {
+      border-bottom-left-radius: 4px;
+    }
+    
+    .aqlbot-message.aqlbot-user {
+      border-bottom-right-radius: 4px;
+    }
+    
+    .aqlbot-typing {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      max-width: 75%;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    
+    .aqlbot-dark .aqlbot-typing {
+      background: #475569;
+      color: #f1f5f9;
+    }
+    
+    .aqlbot-light .aqlbot-typing {
+      background: #f1f5f9;
+      color: #334155;
+    }
+    
+    .aqlbot-typing-dots {
+      display: flex;
+      gap: 2px;
+    }
+    
+    .aqlbot-typing-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: aqlbot-typing-bounce 1.4s infinite ease-in-out;
+    }
+    
+    .aqlbot-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .aqlbot-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    .aqlbot-typing-dot:nth-child(3) { animation-delay: 0s; }
+    
+    @keyframes aqlbot-typing-bounce {
+      0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    
+    .aqlbot-input-area {
+      padding: 16px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    
+    .aqlbot-input {
+      flex: 1;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      min-height: 20px;
+      max-height: 100px;
+      line-height: 1.4;
+    }
+    
+    .aqlbot-input::placeholder {
+      opacity: 0.6;
+    }
+    
+    .aqlbot-send-btn {
+      background: linear-gradient(135deg, var(--aqlbot-primary), var(--aqlbot-secondary));
+      color: #333;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    
+    .aqlbot-send-btn:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+    
+    .aqlbot-send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .aqlbot-branding {
+      text-align: center;
+      padding: 8px 16px;
+      font-size: 11px;
+      opacity: 0.6;
+      border-top: 1px solid;
+    }
+    
+    .aqlbot-dark .aqlbot-branding {
+      border-color: #334155;
+    }
+    
+    .aqlbot-light .aqlbot-branding {
+      border-color: #e2e8f0;
+    }
+    
+    .aqlbot-branding a {
+      color: inherit;
+      text-decoration: none;
+    }
+    
+    .aqlbot-branding a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Position classes */
+    .aqlbot-bottom-right {
+      bottom: 24px;
+      right: 24px;
+    }
+    
+    .aqlbot-bottom-left {
+      bottom: 24px;
+      left: 24px;
+    }
+    
+    .aqlbot-top-right {
+      top: 24px;
+      right: 24px;
+    }
+    
+    .aqlbot-top-left {
+      top: 24px;
+      left: 24px;
+    }
+    
+    .aqlbot-chat-window.aqlbot-top-right,
+    .aqlbot-chat-window.aqlbot-top-left {
+      transform-origin: top;
+    }
+    
+    .aqlbot-chat-window.aqlbot-bottom-left {
+      transform-origin: bottom left;
+    }
+    
+    .aqlbot-chat-window.aqlbot-top-left {
+      transform-origin: top left;
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 480px) {
+      .aqlbot-chat-window {
+        width: calc(100vw - 32px) !important;
+        height: calc(100vh - 100px) !important;
+        max-height: none !important;
+      }
+      
+      .aqlbot-widget.aqlbot-bottom-right,
+      .aqlbot-widget.aqlbot-bottom-left {
+        bottom: 16px;
+        left: 16px;
+        right: 16px;
+      }
+      
+      .aqlbot-widget.aqlbot-top-right,
+      .aqlbot-widget.aqlbot-top-left {
+        top: 16px;
+        left: 16px;
+        right: 16px;
+      }
+    }
+  `;
+
+  // Utility functions
+  function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
+
+  function sanitizeHTML(str) {
+    const temp = document.createElement('div');
+    temp.textContent = str;
+    return temp.innerHTML;
+  }
+
+  function formatTime(date) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Create and inject styles
+  function injectStyles() {
+    if (document.getElementById('aqlbot-styles')) return;
+    
+    const styleSheet = document.createElement('style');
+    styleSheet.id = 'aqlbot-styles';
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
+    
+    // Set CSS custom properties
+    document.documentElement.style.setProperty('--aqlbot-primary', config.primaryColor);
+    document.documentElement.style.setProperty('--aqlbot-secondary', config.secondaryColor);
+    document.documentElement.style.setProperty('--aqlbot-z-index', config.zIndex);
+    document.documentElement.style.setProperty('--aqlbot-width', config.width + 'px');
+    document.documentElement.style.setProperty('--aqlbot-height', config.height + 'px');
+    document.documentElement.style.setProperty('--aqlbot-border-radius', config.borderRadius + 'px');
+  }
+
+  // Create DOM elements
+  function createWidget() {
+    // Main container
+    container = document.createElement('div');
+    container.className = `aqlbot-widget aqlbot-${config.position}`;
+    
+    // Launcher button
+    launcher = document.createElement('button');
+    launcher.className = 'aqlbot-launcher';
+    launcher.innerHTML = config.launcherIcon;
+    launcher.setAttribute('aria-label', 'Open chat');
+    launcher.addEventListener('click', toggleChat);
+    
+    // Chat window
+    chatWindow = document.createElement('div');
+    chatWindow.className = `aqlbot-chat-window ${config.darkMode ? 'aqlbot-dark' : 'aqlbot-light'}`;
+    chatWindow.style.display = 'none';
+    
+    // Header
+    const header = document.createElement('div');
+    header.className = 'aqlbot-header';
+    
+    const headerInfo = document.createElement('div');
+    headerInfo.className = 'aqlbot-header-info';
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'aqlbot-avatar';
+    avatar.textContent = config.botName.charAt(0);
+    
+    const botInfo = document.createElement('div');
+    botInfo.innerHTML = `
+      <div class="aqlbot-bot-name">${sanitizeHTML(config.botName)}</div>
+      <div class="aqlbot-bot-status">Ask anything</div>
+    `;
+    
+    headerInfo.appendChild(avatar);
+    headerInfo.appendChild(botInfo);
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'aqlbot-close-btn';
+    closeBtn.innerHTML = config.closeButtonText;
+    closeBtn.setAttribute('aria-label', 'Close chat');
+    closeBtn.addEventListener('click', closeChat);
+    
+    header.appendChild(headerInfo);
+    header.appendChild(closeBtn);
+    
+    // Messages container
+    messagesContainer = document.createElement('div');
+    messagesContainer.className = 'aqlbot-messages';
+    
+    // Input area
+    const inputArea = document.createElement('div');
+    inputArea.className = 'aqlbot-input-area';
+    
+    inputElement = document.createElement('textarea');
+    inputElement.className = 'aqlbot-input';
+    inputElement.placeholder = config.placeholder;
+    inputElement.rows = 1;
+    inputElement.addEventListener('keydown', handleKeyDown);
+    inputElement.addEventListener('input', handleInputResize);
+    
+    const sendBtn = document.createElement('button');
+    sendBtn.className = 'aqlbot-send-btn';
+    sendBtn.textContent = config.sendButtonText;
+    sendBtn.addEventListener('click', sendMessage);
+    
+    inputArea.appendChild(inputElement);
+    inputArea.appendChild(sendBtn);
+    
+    // Branding
+    let branding = null;
+    if (config.showBranding) {
+      branding = document.createElement('div');
+      branding.className = 'aqlbot-branding';
+      branding.innerHTML = 'Powered by <a href="#" target="_blank">AqlBot</a>';
+    }
+    
+    // Assemble chat window
+    chatWindow.appendChild(header);
+    chatWindow.appendChild(messagesContainer);
+    chatWindow.appendChild(inputArea);
+    if (branding) chatWindow.appendChild(branding);
+    
+    // Assemble main container
+    container.appendChild(launcher);
+    container.appendChild(chatWindow);
+    
+    document.body.appendChild(container);
+  }
+
+  // Message handling
+  function addMessage(text, isUser = false, timestamp = new Date()) {
+    const message = {
+      id: generateId(),
+      text: text,
+      isUser: isUser,
+      timestamp: timestamp
+    };
+    
+    messages.push(message);
+    
+    // Limit message history
+    if (messages.length > config.maxMessages) {
+      messages.shift();
+    }
+    
+    renderMessage(message);
+    scrollToBottom();
+    
+    return message;
+  }
+
+  function renderMessage(message) {
+    const wrapper = document.createElement('div');
+    wrapper.className = `aqlbot-message-wrapper ${message.isUser ? 'aqlbot-user' : 'aqlbot-bot'}`;
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'aqlbot-message-avatar';
+    avatar.textContent = message.isUser ? 'U' : config.botName.charAt(0);
+    
+    const messageEl = document.createElement('div');
+    messageEl.className = `aqlbot-message ${message.isUser ? 'aqlbot-user' : 'aqlbot-bot'}`;
+    messageEl.textContent = message.text;
+    
+    wrapper.appendChild(avatar);
+    wrapper.appendChild(messageEl);
+    
+    messagesContainer.appendChild(wrapper);
+  }
+
+  function showTyping() {
+    if (isTyping) return;
+    
+    isTyping = true;
+    const typingEl = document.createElement('div');
+    typingEl.className = 'aqlbot-message-wrapper aqlbot-bot';
+    typingEl.id = 'aqlbot-typing';
+    
+    typingEl.innerHTML = `
+      <div class="aqlbot-message-avatar">${config.botName.charAt(0)}</div>
+      <div class="aqlbot-typing">
+        <div class="aqlbot-typing-dots">
+          <div class="aqlbot-typing-dot"></div>
+          <div class="aqlbot-typing-dot"></div>
+          <div class="aqlbot-typing-dot"></div>
+        </div>
+      </div>
+    `;
+    
+    messagesContainer.appendChild(typingEl);
+    scrollToBottom();
+  }
+
+  function hideTyping() {
+    if (!isTyping) return;
+    
+    isTyping = false;
+    const typingEl = document.getElementById('aqlbot-typing');
+    if (typingEl) {
+      typingEl.remove();
+    }
+  }
+
+  function scrollToBottom() {
+    setTimeout(() => {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }, 100);
+  }
+
+  // Chat functionality
+  function toggleChat() {
+    if (isOpen) {
+      closeChat();
+    } else {
+      openChat();
+    }
+  }
+
+  function openChat() {
+    if (isOpen) return;
+    
+    isOpen = true;
+    launcher.style.display = 'none';
+    chatWindow.style.display = 'flex';
+    chatWindow.classList.add('aqlbot-opening');
+    
+    // Focus input
+    setTimeout(() => {
+      inputElement.focus();
+      chatWindow.classList.remove('aqlbot-opening');
+    }, 300);
+    
+    // Add welcome message if no messages exist
+    if (messages.length === 0) {
+      addMessage(config.welcomeMessage, false);
+    }
+  }
+
+  function closeChat() {
+    if (!isOpen) return;
+    
+    isOpen = false;
+    chatWindow.classList.add('aqlbot-closing');
+    
+    setTimeout(() => {
+      chatWindow.style.display = 'none';
+      launcher.style.display = 'flex';
+      chatWindow.classList.remove('aqlbot-closing');
+    }, 300);
+  }
+
+  function sendMessage() {
+    const text = inputElement.value.trim();
+    if (!text) return;
+    
+    // Add user message
+    addMessage(text, true);
+    inputElement.value = '';
+    handleInputResize();
+    
+    // Send to API or show demo response
+    if (config.apiEndpoint) {
+      sendToAPI(text);
+    } else {
+      // Demo response
+      if (config.enableTyping) {
+        showTyping();
+        setTimeout(() => {
+          hideTyping();
+          addMessage("Thanks for your message! This is a demo response. Configure the 'apiEndpoint' option to connect to your chatbot API.", false);
+        }, config.typingDelay);
+      } else {
+        addMessage("Thanks for your message! This is a demo response. Configure the 'apiEndpoint' option to connect to your chatbot API.", false);
+      }
+    }
+  }
+
+  async function sendToAPI(message) {
+    if (!config.apiEndpoint) return;
+    
+    try {
+      if (config.enableTyping) {
+        showTyping();
+      }
+      
+      const response = await fetch(config.apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: message,
+          sessionId: getSessionId(),
+          timestamp: new Date().toISOString()
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (config.enableTyping) {
+        hideTyping();
+      }
+      
+      if (data.message) {
+        addMessage(data.message, false);
+      }
+      
+    } catch (error) {
+      console.error('AqlBot API Error:', error);
+      if (config.enableTyping) {
+        hideTyping();
+      }
+      addMessage("Sorry, I'm having trouble connecting right now. Please try again later.", false);
+    }
+  }
+
+  function getSessionId() {
+    let sessionId = localStorage.getItem('aqlbot-session-id');
+    if (!sessionId) {
+      sessionId = generateId();
+      localStorage.setItem('aqlbot-session-id', sessionId);
+    }
+    return sessionId;
+  }
+
+  // Event handlers
+  function handleKeyDown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function handleInputResize() {
+    inputElement.style.height = 'auto';
+    inputElement.style.height = Math.min(inputElement.scrollHeight, 100) + 'px';
+  }
+
+  // Public API
+  const AqlBot = {
+    init: function(options = {}) {
+      // Merge config
+      config = { ...defaultConfig, ...options };
+      
+      // Initialize
+      injectStyles();
+      createWidget();
+      
+      // Return public methods
+      return {
+        open: openChat,
+        close: closeChat,
+        toggle: toggleChat,
+        send: function(message) {
+          addMessage(message, true);
+          if (config.apiEndpoint) {
+            sendToAPI(message);
+          }
+        },
+        addMessage: function(message, isUser = false) {
+          addMessage(message, isUser);
+        },
+        configure: function(newConfig) {
+          config = { ...config, ...newConfig };
+          // Update CSS variables
+          document.documentElement.style.setProperty('--aqlbot-primary', config.primaryColor);
+          document.documentElement.style.setProperty('--aqlbot-secondary', config.secondaryColor);
+        },
+        destroy: function() {
+          if (container) {
+            container.remove();
+            container = null;
+          }
+          const styles = document.getElementById('aqlbot-styles');
+          if (styles) {
+            styles.remove();
+          }
+        }
+      };
+    }
+  };
+
+  // Export to global scope
+  window.AqlBot = AqlBot;
+
+})(window, document);

@@ -1,11 +1,8 @@
-const express = require('express');
-const { body, validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
-const User = require('../models/User');
-const { auth } = require('../middleware/auth');
+const User = require('../../models/User');
 
-const router = express.Router();
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Helper function to generate JWT token
@@ -36,15 +33,10 @@ const sendTokenResponse = (user, statusCode, res, message = 'Success') => {
   });
 };
 
-// @route   POST /api/auth/register
 // @desc    Register user with email & password
+// @route   POST /api/user/auth/register
 // @access  Public
-router.post('/register', [
-  body('name').trim().isLength({ min: 2, max: 50 }).withMessage('Name must be between 2-50 characters'),
-  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('website').optional().isURL().withMessage('Please provide a valid website URL')
-], async (req, res) => {
+const register = async (req, res) => {
   try {
     // Check validation errors
     const errors = validationResult(req);
@@ -85,15 +77,12 @@ router.post('/register', [
       message: 'Server error during registration'
     });
   }
-});
+};
 
-// @route   POST /api/auth/login
 // @desc    Login user with email & password
+// @route   POST /api/user/auth/login
 // @access  Public
-router.post('/login', [
-  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
-  body('password').notEmpty().withMessage('Password is required')
-], async (req, res) => {
+const login = async (req, res) => {
   try {
     // Check validation errors
     const errors = validationResult(req);
@@ -138,12 +127,12 @@ router.post('/login', [
       message: 'Server error during login'
     });
   }
-});
+};
 
-// @route   POST /api/auth/google/register
 // @desc    Register/Login user with Google OAuth
+// @route   POST /api/user/auth/google/register
 // @access  Public
-router.post('/google/register', async (req, res) => {
+const googleAuth = async (req, res) => {
   try {
     const { token } = req.body;
 
@@ -200,12 +189,12 @@ router.post('/google/register', async (req, res) => {
       message: 'Google authentication failed'
     });
   }
-});
+};
 
-// @route   GET /api/auth/me
 // @desc    Get current user
+// @route   GET /api/user/auth/me
 // @access  Private
-router.get('/me', auth, async (req, res) => {
+const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     
@@ -230,26 +219,22 @@ router.get('/me', auth, async (req, res) => {
       message: 'Server error'
     });
   }
-});
+};
 
-// @route   POST /api/auth/logout
 // @desc    Logout user (client-side token removal)
+// @route   POST /api/user/auth/logout
 // @access  Private
-router.post('/logout', auth, (req, res) => {
+const logout = (req, res) => {
   res.json({
     success: true,
     message: 'Logged out successfully! 👋'
   });
-});
+};
 
-// @route   PUT /api/auth/profile
 // @desc    Update user profile
+// @route   PUT /api/user/auth/profile
 // @access  Private
-router.put('/profile', [
-  auth,
-  body('name').optional().trim().isLength({ min: 2, max: 50 }),
-  body('website').optional().isURL()
-], async (req, res) => {
+const updateProfile = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -289,6 +274,13 @@ router.put('/profile', [
       message: 'Server error'
     });
   }
-});
+};
 
-module.exports = router;
+module.exports = {
+  register,
+  login,
+  googleAuth,
+  getMe,
+  logout,
+  updateProfile
+};
